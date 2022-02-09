@@ -1,15 +1,15 @@
 FROM python:3.8-buster
-RUN /usr/local/bin/python -m pip install --upgrade pip
-RUN /usr/local/bin/python -m pip install flask uWSGI
+COPY requirements.txt .
 ENV FLASK_APP=flaskr
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_ENV=development
-RUN apt-get update
-RUN adduser myuser
-USER myuser
-WORKDIR /home/myuser
 ENV PATH="/home/myuser/.local/bin:${PATH}"
-COPY --chown=myuser:myuser .. .
-RUN pip install -r requirements.txt
-RUN flask init-db
+RUN apt-get update &&\
+    /usr/local/bin/python3 -m pip install -r requirements.txt &&\
+    /usr/local/bin/python3 -m pip install --upgrade pip &&\
+    python -m pip install --upgrade setuptools &&\
+    adduser myuser
+WORKDIR /home/myuser
+COPY --chown=myuser:myuser . .
+#RUN flask init-db
 CMD ["uwsgi", "app.ini"]
